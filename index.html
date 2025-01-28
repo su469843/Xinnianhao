@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新年都要计时</title>
+    <title>新年倒计时</title>
     <style>
         body {
             margin: 0;
@@ -33,29 +33,17 @@
             height: 5px;
             border-radius: 50%;
         }
-
-        #message {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            color: white;
-            font-size: 3em;
-            top: 50%;
-            transform: translateY(-50%);
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <h1>新年倒计时</h1>
+    <h1>倒计时至新年</h1>
     <div id="countdown"></div>
     <div id="fireworks"></div>
-    <div id="message"></div>
 
     <!-- 背景音乐 -->
-    <audio id="bg-music" src="music.flac" loop></audio>
+    <audio id="bg-music" src="music.mp3"></audio>
     <!-- 烟花爆炸声 -->
-    <audio id="fireworks-sound" src="1.mp3"></audio>
+    <audio id="fireworks-sound" src="1.mp3" loop></audio>
 
     <script>
         const colors = ['#FF6347', '#FF69B4', '#FFD700', '#00FF00', '#1E90FF', '#FF4500', '#8A2BE2'];
@@ -63,14 +51,14 @@
         const totalFireworks = 15;
 
         class Firework {
-            constructor(x) {
+            constructor(x, y, color) {
                 this.x = x;
-                this.y = window.innerHeight;
+                this.y = y;
                 this.speed = Math.random() * 3 + 2;
                 this.angle = -Math.PI / 2;
                 this.exploded = false;
                 this.particles = [];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.color = color;
                 this.element = document.createElement('div');
                 this.element.className = 'firework';
                 this.element.style.backgroundColor = this.color;
@@ -95,7 +83,7 @@
                 this.exploded = true;
                 this.element.remove();
 
-                for (let i = 0; i < 100; i++) {
+                for (let i = 0; i < 50; i++) {
                     const angle = Math.random() * 2 * Math.PI;
                     const speed = Math.random() * 3 + 1;
                     this.particles.push(new Particle(this.x, this.y, speed, angle, this.color));
@@ -131,40 +119,71 @@
             }
         }
 
-        function launchFirework() {
-            const x = Math.random() * window.innerWidth;
-            const firework = new Firework(x);
+        const fireworks = [];
+
+        function launchFirework(x, y, color) {
+            const firework = new Firework(x, y, color);
             fireworks.push(firework);
         }
 
-        const fireworks = [];
-
         function playFireworks() {
             if (fireworkCount < totalFireworks) {
-                launchFirework();
+                launchFirework(Math.random() * window.innerWidth, window.innerHeight, colors[Math.floor(Math.random() * colors.length)]);
                 fireworkCount++;
             } else if (fireworkCount === totalFireworks) {
-                displayMessage('2025');
+                displayYear('2025');
                 fireworkCount++;
             } else if (fireworkCount === totalFireworks + 1) {
-                displayMessage('蛇年');
+                displayYear('蛇年');
+                fireworkCount++;
+            } else if (fireworkCount === totalFireworks + 2) {
+                displayYear('新年快乐！');
+                fireworkCount++;
+            } else if (fireworkCount === totalFireworks + 3) {
+                displayYear('万事如意！');
                 fireworkCount++;
             }
         }
 
-        function displayMessage(message) {
-            const messageElement = document.getElementById('message');
-            messageElement.innerHTML = message;
-            messageElement.style.display = 'block';
-            setTimeout(() => {
-                messageElement.style.display = 'none';
-                if (message === '2025') {
-                    fireworkCount++;
-                    launchFirework();
-                } else if (message === '蛇年') {
-                    launchFirework();
-                }
-            }, 3000);
+        function displayYear(year) {
+            const positions = getPositionsForYear(year);
+            positions.forEach(pos => {
+                launchFirework(pos.x, pos.y, colors[Math.floor(Math.random() * colors.length)]);
+            });
+        }
+
+        function getPositionsForYear(year) {
+            // Define positions for each character in the year
+            switch(year) {
+                case '2025':
+                    return [
+                        {x: 100, y: 200}, {x: 120, y: 200}, {x: 140, y: 200}, // 2
+                        {x: 160, y: 220}, {x: 180, y: 240}, {x: 200, y: 260}, // 0
+                        {x: 220, y: 200}, {x: 240, y: 220}, {x: 260, y: 240}, // 2
+                        {x: 280, y: 220}, {x: 300, y: 200} // 5
+                    ];
+                case '蛇年':
+                    return [
+                        {x: 100, y: 200}, {x: 120, y: 220}, {x: 140, y: 240}, // 蛇
+                        {x: 160, y: 200}, {x: 180, y: 220}, {x: 200, y: 240}, // 年
+                    ];
+                case '新年快乐！':
+                    return [
+                        {x: 100, y: 200}, {x: 120, y: 220}, {x: 140, y: 240}, // 新
+                        {x: 160, y: 200}, {x: 180, y: 220}, {x: 200, y: 240}, // 年
+                        {x: 220, y: 200}, {x: 240, y: 220}, {x: 260, y: 240}, // 快
+                        {x: 280, y: 200}, {x: 300, y: 220}, {x: 320, y: 240}, // 乐
+                    ];
+                case '万事如意！':
+                    return [
+                        {x: 100, y: 200}, {x: 120, y: 220}, {x: 140, y: 240}, // 万
+                        {x: 160, y: 200}, {x: 180, y: 220}, {x: 200, y: 240}, // 事
+                        {x: 220, y: 200}, {x: 240, y: 220}, {x: 260, y: 240}, // 如
+                        {x: 280, y: 200}, {x: 300, y: 220}, {x: 320, y: 240}, // 意
+                    ];
+                default:
+                    return [];
+            }
         }
 
         function playSound() {
@@ -174,6 +193,10 @@
             fireworksSound.volume = 0.5; // 设置烟花爆炸声音量为50%
             bgMusic.play();
             fireworksSound.play();
+            bgMusic.onended = () => {
+                alert("背景音乐结束，关闭页面。");
+                window.close();
+            };
         }
 
         function animate() {
@@ -183,20 +206,22 @@
 
         function updateCountdown() {
             const now = new Date();
-            const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-            const timeRemaining = tomorrow - now;
+            const nextYear = now.getFullYear() + 1;
+            const newYear = new Date(`January 1, ${nextYear} 00:00:00`);
+            const timeRemaining = newYear - now;
 
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
             const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
             document.getElementById('countdown').innerHTML =
-                `距离明天还有 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`;
+                `距离新年还有 ${days} 天 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`;
 
-            // 如果到达明天，开始烟花和播放声音
+            // 如果到达新年，开始烟花和播放声音
             if (timeRemaining <= 0) {
                 clearInterval(countdownInterval);
-                document.getElementById('countdown').innerHTML = '新的一天快乐!';
+                document.getElementById('countdown').innerHTML = '新年快乐!';
                 setInterval(playFireworks, 1000);
                 playSound(); // 开始播放背景音乐和烟花声音
             }
@@ -206,4 +231,4 @@
         animate();
     </script>
 </body>
-  </html>
+</html>
