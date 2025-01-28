@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新年倒计时</title>
+    <title>新年烟花</title>
     <style>
         body {
             margin: 0;
@@ -12,12 +12,6 @@
             color: white;
             font-family: Arial, sans-serif;
             text-align: center;
-        }
-
-        #countdown {
-            font-size: 2em;
-            color: #FF6347;
-            margin-top: 20px;
         }
 
         .firework {
@@ -36,8 +30,6 @@
     </style>
 </head>
 <body>
-    <h1>倒计时至新年</h1>
-    <div id="countdown"></div>
     <div id="fireworks"></div>
 
     <!-- 背景音乐 -->
@@ -204,31 +196,10 @@
             requestAnimationFrame(animate);
         }
 
-        function updateCountdown() {
-            const now = new Date();
-            const nextYear = now.getFullYear() + 1;
-            const newYear = new Date(`January 1, ${nextYear} 00:00:00`);
-            const timeRemaining = newYear - now;
-
-            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-            document.getElementById('countdown').innerHTML =
-                `距离新年还有 ${hours} 小时 ${minutes} 分钟 ${seconds} 秒`;
-
-            // 如果到达新年，开始烟花和播放声音
-            if (timeRemaining <= 0) {
-                clearInterval(countdownInterval);
-                document.getElementById('countdown').innerHTML = '新年快乐!';
-                setInterval(playFireworks, 1000);
-                playSound(); // 开始播放背景音乐和烟花声音
-            }
-        }
-
-        const countdownInterval = setInterval(updateCountdown, 1000);
+        // 开始播放烟花效果和声音
+        setInterval(playFireworks, 1000);
         animate();
+        playSound(); // 开始播放背景音乐和烟花声音
     </script>
 </body>
 </html>
