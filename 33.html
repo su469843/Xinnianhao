@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烟花效果</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        .firework {
+            position: absolute;
+            width: 2px;
+            height: 10px;
+            background-color: white;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+        }
+
+        #message {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 3em;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="fireworks"></div>
+    <div id="message">2025</div>
+
+    <!-- 背景音乐 -->
+    <audio id="bg-music" src="music.flac" loop></audio>
+    <!-- 烟花爆炸声 -->
+    <audio id="fireworks-sound" src="1.mp3"></audio>
+
+    <script>
+        const colors = ['#FF6347', '#FF69B4', '#FFD700', '#00FF00', '#1E90FF', '#FF4500', '#8A2BE2'];
+        let fireworkCount = 0;
+        const totalFireworks = 15;
+
+        class Firework {
+            constructor(x) {
+                this.x = x;
+                this.y = window.innerHeight;
+                this.speed = Math.random() * 3 + 2;
+                this.angle = -Math.PI / 2;
+                this.exploded = false;
+                this.particles = [];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.element = document.createElement('div');
+                this.element.className = 'firework';
+                this.element.style.backgroundColor = this.color;
+                document.getElementById('fireworks').appendChild(this.element);
+            }
+
+            update() {
+                if (!this.exploded) {
+                    this.y += this.speed * Math.sin(this.angle);
+                    this.element.style.left = `${this.x}px`;
+                    this.element.style.top = `${this.y}px`;
+
+                    if (this.y < Math.random() * (window.innerHeight / 2)) {
+                        this.explode();
+                    }
+                } else {
+                    this.particles.forEach(particle => particle.update());
+                }
+            }
+
+            explode() {
+                this.exploded = true;
+                this.element.remove();
+
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const speed = Math.random() * 3 + 1;
+                    this.particles.push(new Particle(this.x, this.y, speed, angle, this.color));
+                }
+            }
+        }
+
+        class Particle {
+            constructor(x, y, speed, angle, color) {
+                this.x = x;
+                this.y = y;
+                this.speed = speed;
+                this.angle = angle;
+                this.color = color;
+                this.lifetime = 100;
+                this.element = document.createElement('div');
+                this.element.className = 'particle';
+                this.element.style.backgroundColor = this.color;
+                document.getElementById('fireworks').appendChild(this.element);
+            }
+
+            update() {
+                if (this.lifetime > 0) {
+                    this.x += this.speed * Math.cos(this.angle);
+                    this.y += this.speed * Math.sin(this.angle);
+                    this.lifetime--;
+                    this.element.style.left = `${this.x}px`;
+                    this.element.style.top = `${this.y}px`;
+                    this.element.style.opacity = this.lifetime / 100;
+                } else {
+                    this.element.remove();
+                }
+            }
+        }
+
+        function launchFirework() {
+            const x = Math.random() * window.innerWidth;
+            const firework = new Firework(x);
+            fireworks.push(firework);
+        }
+
+        const fireworks = [];
+
+        function playFireworks() {
+            if (fireworkCount < totalFireworks) {
+                launchFirework();
+                fireworkCount++;
+            } else if (fireworkCount === totalFireworks) {
+                displayMessage('2025');
+                fireworkCount++;
+            } else if (fireworkCount === totalFireworks + 1) {
+                displayMessage('蛇年');
+                fireworkCount++;
+            }
+        }
+
+        function displayMessage(message) {
+            const messageElement = document.getElementById('message');
+            messageElement.innerHTML = message;
+            messageElement.style.display = 'block';
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+                if (message === '2025') {
+                    fireworkCount++;
+                    launchFirework();
+                } else if (message === '蛇年') {
+                    launchFirework();
+                }
+            }, 2000);
+        }
+
+        function playSound() {
+            const bgMusic = document.getElementById('bg-music');
+            const fireworksSound = document.getElementById('fireworks-sound');
+            bgMusic.volume = 0.6; // 设置背景音乐音量为60%
+            fireworksSound.volume = 0.5; // 设置烟花爆炸声音量为50%
+            bgMusic.play();
+            fireworksSound.play();
+        }
+
+        function animate() {
+            fireworks.forEach(firework => firework.update());
+            requestAnimationFrame(animate);
+        }
+
+        setInterval(playFireworks, 1000);
+        animate();
+        playSound(); // 在页面加载时播放音乐和烟花声音
+    </script>
+</body>
+</html>
